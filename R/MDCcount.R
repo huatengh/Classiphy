@@ -15,6 +15,7 @@ MDCcount<-function(repfolder=NULL,sfile=NULL, gfile=NULL,phylonet.path,save.midd
   if(is.na(repfolder)){
     s<-read.tree(sfile)
     g<-read.tree(gfile)
+    repfolder=sub(basename(gfile),'',gfile,perl = T)
   }else{
     s<-read.tree(paste(repfolder,"/s_tree.trees",sep=''))
     s$edge.length<-NULL

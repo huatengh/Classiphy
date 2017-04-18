@@ -11,7 +11,7 @@ subtree.freq<-function(repfolder=NULL,sfile=NULL, gfile=NULL,max.freq=0.1,save.m
   if(is.na(repfolder)){
     s<-read.tree(sfile)
     g<-read.tree(gfile)
-
+    repfolder=sub(basename(gfile),'',gfile,perl = T)
   }else{
     s<-read.tree(paste(repfolder,"/s_tree.trees",sep=''))
     g<-read.tree(paste(repfolder,"/g_trees.trees",sep=''))
