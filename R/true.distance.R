@@ -4,13 +4,20 @@
 # rf distance between lt and gt-- the relative amount of coalescent variances
 # by default saves a middle file truedistance.txt in the folder
 
-true.distance<-function(repfolder,save.middle.file=T){
+true.distance<-function(repfolder=NULL,sfile=NULL,gfile=NULL,lfile=NULL,save.middle.file=T){
   require(ape)
   require(phangorn)
   require(phytools)
-  l<-read.tree(paste(repfolder,"/l_trees.trees",sep=''))
-  s<-read.tree(paste(repfolder,"/s_tree.trees",sep=''))
-  g<-read.tree(paste(repfolder,"/g_trees.trees",sep=''))
+  if(is.null(repfolder)){
+    l<-read.tree(lfile)
+    s<-read.tree(sfile)
+    g<-read.tree(gfile)
+
+  }else{
+    l<-read.tree(paste(repfolder,"/l_trees.trees",sep=''))
+    s<-read.tree(paste(repfolder,"/s_tree.trees",sep=''))
+    g<-read.tree(paste(repfolder,"/g_trees.trees",sep=''))
+  }
   for (i in 1:length(l)){
     l[[i]]$tip.label<-sub("_0$","",l[[i]]$tip.label,perl =T )
     g[[i]]$tip.label<-gsub("_0_0$","",g[[i]]$tip.label,perl =T )

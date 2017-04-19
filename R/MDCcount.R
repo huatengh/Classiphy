@@ -12,7 +12,7 @@ MDCcount<-function(repfolder=NULL,sfile=NULL, gfile=NULL,phylonet.path,save.midd
   resultfile=paste(repfolder,'/phylonetoutput.txt',sep = '')
   matrixfile=paste(repfolder,'/MDCcounts.txt',sep = '')
 
-  if(is.na(repfolder)){
+  if(is.null(repfolder)){
     s<-read.tree(sfile)
     g<-read.tree(gfile)
     repfolder=sub(basename(gfile),'',gfile,perl = T)

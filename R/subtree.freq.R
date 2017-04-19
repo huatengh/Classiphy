@@ -8,7 +8,7 @@ subtree.freq<-function(repfolder=NULL,sfile=NULL, gfile=NULL,max.freq=0.1,save.m
   require(ape)
   require(phangorn)
   require(phytools)
-  if(is.na(repfolder)){
+  if(is.null(repfolder)){
     s<-read.tree(sfile)
     g<-read.tree(gfile)
     repfolder=sub(basename(gfile),'',gfile,perl = T)
@@ -57,7 +57,7 @@ subtree.freq<-function(repfolder=NULL,sfile=NULL, gfile=NULL,max.freq=0.1,save.m
   }
 
   j<-ceiling(max.freq*length(g))
-  ks<-apply(gfreq,MARGIN = 1,function(l){sapply(1:j,function(i) sum(l<=i/dim(xx)[1]))})
+  ks<-apply(gfreq,MARGIN = 1,function(l){sapply(1:j,function(i) sum(l<=i/dim(gfreq)[1]))})
   ks<-t(ks)
 
   Q75<-apply(ks,MARGIN = 2,function(i)quantile(i,0.75))
@@ -65,7 +65,7 @@ subtree.freq<-function(repfolder=NULL,sfile=NULL, gfile=NULL,max.freq=0.1,save.m
   IQR<-Q75-Q25
   IQR[IQR==0]<-0.5
   k<-matrix(0,nrow = dim(ks)[1],ncol = dim(ks)[2])
-  for(i in 1:dim(xx)[1]){
+  for(i in 1:dim(gfreq)[1]){
     l<-ks[i,]-Q75
     k[i,]<-as.vector(as.numeric(l/IQR))
   }

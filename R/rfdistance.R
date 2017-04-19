@@ -4,7 +4,7 @@ rfdistance<-function(repfolder=NULL,sfile=NULL, gfile=NULL){
   require(ape)
   require(phangorn)
   require(phytools)
-  if(is.na(repfolder)){
+  if(is.null(repfolder)){
     s<-read.tree(sfile)
     g<-read.tree(gfile)
     repfolder=sub(basename(gfile),'',gfile,perl = T)

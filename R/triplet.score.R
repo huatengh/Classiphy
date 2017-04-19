@@ -2,11 +2,11 @@
 # have the option to save middle file (large RData file, default is false)
 # depends on the number of tips, could need large memory
 
-triplet.score<-function(repfolder=NULL,sfile=NULL, gfile=NULL,max.freq=0.1,save.middle.file=F){
+triplet.score<-function(repfolder=NULL,sfile=NULL, gfile=NULL,save.middle.file=F){
   require(ape)
   require(phangorn)
   require(phytools)
-  if(is.na(repfolder)){
+  if(is.null(repfolder)){
     s<-read.tree(sfile)
     g<-read.tree(gfile)
     repfolder=sub(basename(gfile),'',gfile,perl = T)
