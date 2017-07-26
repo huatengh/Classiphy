@@ -5,5 +5,6 @@ training.data<-function(repfolder=NULL,sfile=NULL,gfile=NULL,lfile=NULL,phylonet
   x<-sumstat(repfolder=repfolder,sfile=sfile, gfile=gfile,phylonet.path=phylonet.path,max.freq=max.freq,rf=rf,tscore=tscore,mdcscore=mdcscore,subtree=subtree)
   x$model.id<-'ILS'
   x$model.id[y$dSL>0]<-'HGT'
+  x$model.id<-as.factor(x$model.id)
   return(x)
 }
