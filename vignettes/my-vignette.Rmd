@@ -110,4 +110,4 @@ result<-classifyData(target.summary.stats = testingdata,training.summary.stats =
 The returning object `result` is list of two:
 
 * `classification.results` A data frame showing the classification result on the testing data, one row per gene tree: the assigned model (i.e., HGT or ILS), and the posterior weight in each model.
-* `trained.model` The trained model, which includes the information that can be use to assess how the model performed based on the posterior prediction of the training data set. [need more details here]
+* `trained.model` The trained model, which includes the information that can be use to assess how the model performed based on the posterior prediction of the training data set. 
