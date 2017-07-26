@@ -22,7 +22,7 @@ simphy.simu<-function(simphy.executable="simphy_lnx64",control.file,remove.indiv
   o.line<-grep("^-o ",simphy.contrlfile)
   output.folder=NULL
   if(length(o.line)==1){
-    output.folder<-sub("^-o (\\S+)\\s*\\.*$","\\1",simphy.contrlfile[o.line])
+    output.folder<-sub("^-o (\\S+) *.*$","\\1",simphy.contrlfile[o.line])
   }
 
   # if(is.null(rl)){

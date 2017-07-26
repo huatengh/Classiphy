@@ -1,6 +1,5 @@
-#this is a copy of analyze-dapc.R script from the archipelago program written by Jeet sukumuran
-
-
+#this is a copy of analyze-dapc.R from the archipelago
+#written by Jeet Sukumaran
 CANDIDATE.GROUPING.FIELD.NAMES <- c("model_id", "model.id", "model.category", "dispersal.model")
 getGroupingFieldName <- function(summary.df) {
   fieldnames <- colnames(summary.df)
@@ -14,26 +13,6 @@ getGroupingFieldName <- function(summary.df) {
 
 # Core Analytical Functions {{{1
 
-
-## Given a training data set and test data set, ensures that all predictors are in the range of 0 to 1
-normalize.summary.stats = function(target.summary.stats, training.summary.stats, is.include.target.summary.stats.data.in.normalization.range=T) {
-  predictor.fields = colnames(training.summary.stats)[grepl('^predictor', names(training.summary.stats))]
-  for (fieldname in predictor.fields) {
-    if (is.include.target.summary.stats.data.in.normalization.range) {
-      min_x = min(training.summary.stats[fieldname], target.summary.stats[fieldname])
-      max_x = max(training.summary.stats[fieldname], target.summary.stats[fieldname])
-    } else {
-      min_x = min(training.summary.stats[fieldname])
-      max_x = max(training.summary.stats[fieldname])
-    }
-    value_range = max_x - min_x
-    training.summary.stats[fieldname] = (training.summary.stats[fieldname] - min_x) / value_range
-    target.summary.stats[fieldname] = (target.summary.stats[fieldname] - min_x) / value_range
-  }
-  return(list(training.summary.stats=training.summary.stats, target.summary.stats=target.summary.stats))
-}
-
-
 # Given a data.frame, returns a list with two named elements:
 #   `group`: data.frame
 #       A data.frame consisting of a single-column, the grouping variable
@@ -43,17 +22,9 @@ extractGroupAndPredictors <- function(summary.df) {
   if (is.null(summary.df)) {
     return(NULL)
   }
-  # summary.df <- na.omit(summary.df)
-
+  summary.df <- na.omit(summary.df)
   group <- summary.df[[getGroupingFieldName(summary.df)]]
-  predictors <- extractPredictors(summary.df=summary.df, is.omit.na=F)
-  na.rows = which(is.na(predictors), arr.ind=T)[,1]
-  if (length(na.rows) > 0) {
-    # group <- group[-na.rows,]
-    group <- group[-na.rows]
-    predictors <- predictors[-na.rows,]
-  }
-
+  predictors <- extractPredictors(summary.df)
   rv <- list(
     group=group,
     predictors=predictors
@@ -64,14 +35,12 @@ extractGroupAndPredictors <- function(summary.df) {
 # Given a data.frame, returns a list with two named elements:
 #   `predictors`: data.frame
 #       A data.frame consisting of (just) the predictor variables.
-extractPredictors <- function(summary.df, is.omit.na=F) {
+extractPredictors <- function(summary.df) {
   if (is.null(summary.df)) {
     return(NULL)
   }
+  summary.df <- na.omit(summary.df)
   predictors <- summary.df[, grepl('^predictor', names(summary.df))]
-  if (is.omit.na) {
-    predictors <- na.omit(predictors)
-  }
   return(predictors)
 }
 
@@ -84,8 +53,6 @@ extractPredictors <- function(summary.df, is.omit.na=F) {
 # In the same way, correct.assigns.prop["unconstrained"] is the proportion of
 # times the "unconstrained" model was correctly classified.
 calculateDAPC <- function(predictors, group, n.pca, n.da, verbose.on.insufficient.groups=F) {
-  # write.csv(predictors, "predictors.csv", row.names=F)
-  # write.csv(group, "group.csv", row.names=F)
   num.groups <- length(unique(group))
   if (num.groups < 2) {
     if (verbose.on.insufficient.groups) {
@@ -94,11 +61,7 @@ calculateDAPC <- function(predictors, group, n.pca, n.da, verbose.on.insufficien
     return(NULL)
   }
   dapc.result <- dapc(predictors, group, n.pca=n.pca, n.da=n.da)
-  var.names = rownames(dapc.result$var.contr)
-  if (length(var.names) == 0) {
-    var.names = dapc.result$var.contr
-  }
-  var.contr <- data.frame(var=var.names,
+  var.contr <- data.frame(var=rownames(dapc.result$var.contr),
                           LD1=as.vector(dapc.result$var.contr)
   )
   var.contr <- var.contr[order(-var.contr$LD1),]
@@ -128,7 +91,6 @@ calculateDAPC <- function(predictors, group, n.pca, n.da, verbose.on.insufficien
   rv <- list(
     dapc.result=dapc.result,
     var.contr=var.contr,
-    pca.loadings=dapc.result$pca.loadings,
     model.prefs=model.prefs,
     # true.model.posterior.mean=true.model.posterior.mean,
     # mean.count.correct.model.preferred=mean.count.correct.model.preferred,
@@ -295,19 +257,8 @@ classifyData <- function(target.summary.stats,
                          training.summary.stats,
                          n.pca,
                          n.da=NULL,
-                         n.pca.optimization.penalty.weight=1.0,
-                         is.normalize.summary.stats=T,
-                         is.include.target.summary.stats.data.in.normalization.range=T
+                         n.pca.optimization.penalty.weight=1.0
 ) {
-  require(adegenet)
-  if (is.normalize.summary.stats) {
-    rv = normalize.summary.stats(
-      target.summary.stats=target.summary.stats,
-      training.summary.stats=training.summary.stats,
-      is.include.target.summary.stats.data.in.normalization.range=is.include.target.summary.stats.data.in.normalization.range)
-    target.summary.stats = rv$target.summary.stats
-    training.summary.stats = rv$training.summary.stats
-  }
   training.data <- extractGroupAndPredictors(training.summary.stats)
   predictors <- training.data$predictors
   group <- training.data$group
@@ -343,7 +294,7 @@ classifyData <- function(target.summary.stats,
     group,
     n.pca=n.pca,
     n.da=n.da)
-  target.predictors <- extractPredictors(target.summary.stats, is.omit.na=F)
+  target.predictors <- extractPredictors(target.summary.stats)
   pred.sup <- predict.dapc(trained.model$dapc.result, newdata=target.predictors)
   classification.results <- data.frame(pred.sup)
   classification.results$n.pca <- n.pca

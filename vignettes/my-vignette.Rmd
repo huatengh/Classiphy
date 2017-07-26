@@ -65,7 +65,7 @@ It will generate a main folder `test` to store the simulation results , in which
 * a locus tree file `l_trees.trees`,  containing 50 locus tree Newick format as specified in `-rl f:50`, whose topology might be differ from the species tree due to HGT
 * a gene tree file `g_trees.trees`, containing 50 gene trees, whose topology will be differ from species tree due to ILS and/or HGT
 
-In principle, user can use any program to do the simulation as long as the simulated trees are organized into three files like this. We only considering the situation where one individual is sequenced for each species (like most of phylogenomic studies), so the tip labels in locus and gene trees need to be consistent with those of species tree, and currently, branch length is not used in calculating summary statistics, so the trees can be topology-only.
+In principle, user can use any program to do the simulation as long as the simulated trees are organized into three files like this. We only considering the situation where one individual is sequenced for each species (like most of phylogenomic studies), so the tip labels in the locus and gene trees need to be consistent with those of the species tree, and currently, branch length is not used in calculating summary statistics, so the trees can be topology-only.
 
 
 ## 2.Calculating summary statistics on simulated data
@@ -84,8 +84,8 @@ trainingdata<-training.data(repfolder,phylonet.path)
 
 User need to provide:
 
-* `repfolder`: the path to one repfolder
-* `phylonet.path`: the path to the executable file of PhyloNet (which was used to calculate MDC between gene tree and species trees)
+* `repfolder`: the path to one repfolder, with the control file example above, it will be either `test/1` or `test/2`
+* `phylonet.path`: the path to the executable file of PhyloNet (which is used to calculate MDC between gene tree and species trees)
 
 This function will return the training data as a data frame, one row per gene tree. Hence, for multiple repfolders, this function can be run sequentially or parallelly across the repfolders, and `rbind` the result into one big training data matrix. 
 
@@ -101,7 +101,7 @@ This returns a data matrix with summary statistics calculated from the empirical
 
 ## 4.Running DAPC classification
 
-Classiphy uses the `dapc` function in R package `adegenet` for classification. This package includes a wrapper function `classifyData` originally written by Jeet Sukumaran in program [archipelago](https://github.com/jeetsukumaran/archipelago)  
+The `dapc` function in R package `adegenet` is used for classification. This package uses a wrapper function `classifyData`  written by Jeet Sukumaran in originally for the program [archipelago](https://github.com/jeetsukumaran/archipelago)  
 
 ```{r eval=FALSE}
 result<-classifyData(target.summary.stats = testingdata,training.summary.stats = trainingdata,n.pca = 'optimize',n.da=NULL,n.pca.optimization.penalty.weight = 0)

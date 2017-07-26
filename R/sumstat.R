@@ -1,12 +1,9 @@
 #this is a function calculating summary statistics for gene trees
 
-sumstat<-function(sfile=NULL,gfile=NULL,phylonet.path,repfolder=NULL,max.freq=0.1,rf=T,tscore=T,mdcscore=T,subtree=T){
+sumstat<-function(repfolder=NULL,sfile=NULL,gfile=NULL,phylonet.path,max.freq=0.1,rf=T,tscore=T,mdcscore=T,subtree=T){
   require(ape)
   if(is.null(gfile)){
-    sfile<-paste(repfolder,"/s_tree.trees",sep='')
     gfile<-paste(repfolder,"/g_trees.trees",sep='')
-  }else{
-    repfolder<-NULL
   }
   g<-read.tree(gfile)
   x<-data.frame(gfile=rep(gfile,length(g)),stringsAsFactors = F)
