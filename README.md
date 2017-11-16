@@ -1,5 +1,5 @@
 # Classiphy
-Classify gene trees basing on the processes generating species-tree gene-tree discordance
+Classify gene trees regards to the processes generating species-tree gene-tree discordance
 
 
 ## Classiphy analysis overview
@@ -32,7 +32,7 @@ Below is an example:
 -rs 2 //2 species trees
 -rl f:50 // 50 locus trees (i.e., gene trees)
 -sb f:0.000001 
--sd f:0.0000005 //species birth and death rate
+-sd f:0.0000005 //species birth (sb) and death rate (sd)
 -st f:5000000 // total specie tree depth
 -sl f:20 // number of species
 -si f:1 // 1 individual per species
@@ -43,7 +43,7 @@ Below is an example:
 -ld f:0 // no gene loss
 -lg f:0 // no gene conversion
 -lk 1 // Distance-dependent HGT
--gt u:0.00000001,0.00000005 // uniform distributed HGT rate
+-gt u:0.00000001,0.00000005 // uniform distributed HGT rate, specifying the min and max
 -lt f:gt
 -V 1 // screen output option 1
 -o test //output folder name
@@ -52,11 +52,11 @@ Below is an example:
 -ol 0 //turn off some output options so only output trees
 ```
 
-It will generate a main folder `test` to store the simulation results , in which are two subfolders `1` and `2`, corresponding to the 2 species tree replicates we specified in the first line `-rs 2` . Heretoafter we refer these two folders as `repfolder`. In each repfolder, there are
+With this example control file, Simphy will generate a main folder `test` to store the simulation results. In the main folder, there are two subfolders `1` and `2`, corresponding to the two species tree replicates we specified in the first line (`-rs 2`) . Heretoafter we refer these two folders as `repfolder`. In each repfolder, there are
 
 * a species tree file `s_tree.trees`, a one-line file with one tree in Newick format
-* a locus tree file `l_trees.trees`,  containing 50 locus tree Newick format as specified in `-rl f:50`, whose topology might be differ from the species tree due to HGT
-* a gene tree file `g_trees.trees`, containing 50 gene trees, whose topology will be differ from species tree due to ILS and/or HGT
+* a locus tree file `l_trees.trees`,  containing 50 locus trees in Newick format (`-rl f:50`), whose topology might be differ from the species tree due to HGT
+* a gene tree file `g_trees.trees`, containing 50 gene trees, whose topology might be differ from its locus tree due to ILS
 
 In principle, user can use any program to do the simulation as long as the simulated trees are organized into three files like this. We only considering the situation where one individual is sequenced for each species (like most of phylogenomic studies), so the tip labels in the locus and gene trees need to be consistent with those of the species tree, and currently, branch length is not used in calculating summary statistics, so the trees can be topology-only.
 
@@ -77,10 +77,14 @@ trainingdata<-training.data(repfolder,phylonet.path)
 
 User need to provide:
 
-* `repfolder`: the path to one repfolder, with the control file example above, it will be either `test/1` or `test/2`
+* `repfolder`: the path to one repfolder. In the example above, it could be `test/1` or `test/2`
 * `phylonet.path`: the path to the executable file of PhyloNet (which is used to calculate MDC between gene tree and species trees)
 
 This function will return the training data as a data frame, one row per gene tree. Hence, for multiple repfolders, this function can be run sequentially or parallelly across the repfolders, and `rbind` the result into one big training data matrix. 
+
+User can add in additional summary statistics to the data frame of training data using column bind `cbind`. Make sure the name of additional columns start with "predictor." so that the DAPC function in step 4 will recognize these additional columns as the predictor variables that it should use.
+
+Currently, CLASSIPHY specify the true model for training data using RF distance between locus tree and species tree-- larger-than-zero distance is labelled as HGT gene trees, and zero distance as ILS gene trees (i.e., we do not identify HGT events that result in no topological changes on the tree). This information is stored in the `model.id` column of the training data. If needed, user can change the content of `model.id` (e.g., interested in processes other than HGT), DAPC model will be trained to identify the custom categories in user-specified `model.id` .
 
 ## 3.Calculating summary statistics on empirical data
 
@@ -92,9 +96,11 @@ Similar to the `training.data` function, here user need to specify the path to t
 
 This returns a data matrix with summary statistics calculated from the empirical data, which will be the testing data set for next step.
 
+If user added additional summary statistics to the training data in step 2, the same columns should also be added to the testing data.
+
 ## 4.Running DAPC classification
 
-The `dapc` function in R package `adegenet` is used for classification. This package uses a wrapper function `classifyData`  written by Jeet Sukumaran in originally for the program [archipelago](https://github.com/jeetsukumaran/archipelago)  
+The `dapc` function in R package `adegenet` is used for classification. This package uses a wrapper function `classifyData`  written by Jeet Sukumaran originally for the program [archipelago](https://github.com/jeetsukumaran/archipelago)  
 
 ```{r eval=FALSE}
 result<-classifyData(target.summary.stats = testingdata,training.summary.stats = trainingdata,n.pca = 'optimize',n.da=NULL,n.pca.optimization.penalty.weight = 0)
