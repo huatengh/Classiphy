@@ -14,12 +14,12 @@ balance.training.data<-function(x,repncolumnname="repn"){
     hgt<-which(xx[,repncolumnname]==r & model=="HGT")
     if(length(ils)>length(hgt)){
       l<-c(l,ils[(length(ils)-length(hgt)):length(ils)])
-    }else{
+    }else if(length(ils)<length(hgt)){
       l<-c(l,hgt[(length(hgt)-length(ils)):length(hgt)])
     }
   }
 
-  x<-x[-l,]
+  if(length(l)>0){x<-x[-l,]}
   x$model.id<-as.factor(x$model.id)
   return(x)
 }
