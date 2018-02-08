@@ -86,6 +86,13 @@ User can add in additional summary statistics to the data frame of training data
 
 Currently, CLASSIPHY specify the true model for training data using RF distance between locus tree and species tree-- larger-than-zero distance is labelled as HGT gene trees, and zero distance as ILS gene trees (i.e., we do not identify HGT events that result in no topological changes on the tree). This information is stored in the `model.id` column of the training data. If needed, user can change the content of `model.id` (e.g., interested in processes other than HGT), DAPC model will be trained to identify the custom categories in user-specified `model.id` .
 
+If HGT events are rare, majority of the gene trees will be ILS trees, which will make the machine learning algorithm preferentially assign gene trees to ILS. We recommend balancing the training dataset using function `balance.training.data`. 
+
+```{r eval=FALSE}
+trainingdata<-balance.training.data(trainingdata)
+```
+However, balancing is not mandatory. As the DAPC analysis does not take much computation time, researchers could try with both balanced and original training data.
+
 ## 3.Calculating summary statistics on empirical data
 
 ```{r eval=FALSE}
@@ -94,7 +101,7 @@ testingdata<-sumstat(sfile,gfile,phylonet.path)
 
 Similar to the `training.data` function, here user need to specify the path to the (estimated) species tree file `sfile`, and the gene tree file `gfile`. (If the species tree and gene tree file are named as s_tree.trees, and g_trees.trees, user can also just specify the folder path as `repfolder=`)
 
-This returns a data matrix with summary statistics calculated from the empirical data, which will be the testing data set for next step.
+This returns a data matrix with summary statistics calculated from the empirical data, which will be the testing data set for next step. Currently, this function does not work with gene trees with more-than-one sequences per species, and gene trees with missing data.
 
 If user added additional summary statistics to the training data in step 2, the same columns should also be added to the testing data.
 
