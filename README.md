@@ -60,7 +60,7 @@ With this example control file, Simphy will generate a main folder `test` to sto
 
 In principle, user can use any program to do the simulation as long as the simulated trees are organized into three files like this. We only considering the situation where one individual is sequenced for each species (like most of phylogenomic studies), so the tip labels in the locus and gene trees need to be consistent with those of the species tree, and currently, branch length is not used in calculating summary statistics, so the trees can be topology-only.
 
-To simulating training data for a empirical dataset (i.e., a set of gene trees), two parameters should set according to the empirical dataset `-rl`: the number of locus, and `-sl`: the number of species. Simphy can simulate species trees with tree depth (`-st`, user and specify a range) and a speciation/extinction model(`-sb` and `-sb`), or take an estimated species tree as the starting tree. User can decide (or test) how much information from the empirical dataset to brought in this simulation step.
+To simulating training data for a empirical dataset (i.e., a set of gene trees), two parameters should set according to the empirical dataset `-rl`: the number of locus, and `-sl`: the number of species. Simphy can simulate species trees with tree depth (`-st`, can be a range) and a speciation/extinction model(`-sb` and `-sb`), or take an estimated species tree as the starting tree. User can decide (or test) how much information from the empirical dataset to brought in this simulation step.
 
 
 ## 2.Calculating summary statistics on simulated data
